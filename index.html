@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japanese Verb Study</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        button { padding: 10px 20px; font-size: 18px; margin: 10px; }
+    </style>
+</head>
+<body>
+
+    <h1>Japanese Verb Study</h1>
+    <p>Listen and guess the verb form.</p>
+
+    <h2 id="verb"></h2>
+    <p><strong>Form:</strong> <span id="form"></span></p>
+    <button onclick="speakVerb()">🔊 Repeat</button>
+    <button onclick="showAnswer()">✅ Show Answer</button>
+    <button onclick="nextVerb()">➡ Next</button>
+
+    <div id="answer" style="display: none;">
+        <h3>All Forms:</h3>
+        <p><strong>Dictionary:</strong> <span id="dictForm"></span></p>
+        <p><strong>Te Form:</strong> <span id="teForm"></span></p>
+        <p><strong>Ta Form:</strong> <span id="taForm"></span></p>
+        <p><strong>Nai Form:</strong> <span id="naiForm"></span></p>
+        <p><strong>Masu Form:</strong> <span id="masuForm"></span></p>
+    </div>
+
+    <script>
+        let currentVerb = "";
+
+        async function fetchVerb() {
+            document.getElementById("answer").style.display = "none";
+            
+            let response = await fetch("/get-verb");
+            let data = await response.json();
+
+            document.getElementById("form").textContent = data.form;
+            document.getElementById("verb").textContent = data.verb;
+            currentVerb = data.verb;
+
+            document.getElementById("dictForm").textContent = data.all_forms["Dictionary Form"];
+            document.getElementById("teForm").textContent = data.all_forms["Te Form"];
+            document.getElementById("taForm").textContent = data.all_forms["Ta Form"];
+            document.getElementById("naiForm").textContent = data.all_forms["Nai Form"];
+            document.getElementById("masuForm").textContent = data.all_forms["Masu Form"];
+
+            speakVerb();
+        }
+
+        function speakVerb() {
+            let msg = new SpeechSynthesisUtterance(currentVerb);
+            msg.lang = "ja-JP"; // Japanese voice
+            speechSynthesis.speak(msg);
+        }
+
+        function showAnswer() {
+            document.getElementById("answer").style.display = "block";
+        }
+
+        function nextVerb() {
+            fetchVerb();
+        }
+
+        window.onload = fetchVerb;
+    </script>
+
+</body>
+</html>
