@@ -14,8 +14,7 @@
     <h1>Japanese Verb Study</h1>
     <p>Listen and guess the verb form.</p>
 
-    <h2 id="verb"></h2>
-    <p><strong>Form:</strong> <span id="form"></span></p>
+    
     <button onclick="speakVerb()">🔊 Repeat</button>
     <button onclick="showAnswer()">✅ Show Answer</button>
     <button onclick="nextVerb()">➡ Next</button>
@@ -38,8 +37,7 @@
             let response = await fetch("/get-verb");
             let data = await response.json();
 
-            document.getElementById("form").textContent = data.form;
-            document.getElementById("verb").textContent = data.verb;
+        
             currentVerb = data.verb;
 
             document.getElementById("dictForm").textContent = data.all_forms["Dictionary Form"];
