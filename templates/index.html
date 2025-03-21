@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
     <title>Japanese Verb Study</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
@@ -50,12 +51,11 @@
         }
 
         function speakVerb() {
-            let msg = new SpeechSynthesisUtterance(currentVerb);
-            msg.lang = "ja-JP"; // Japanese voice
-            let voices = speechSynthesis.getVoices().filter(voice => voice.lang == "ja-JP")
-            msg.voice = voices[Math.floor(Math.random() * voices.length)];
-            console.log(voices)
-            speechSynthesis.speak(msg);
+            responsiveVoice.speak(currentVerb, 'Japanese Female', {
+                pitch: 1,    // Range: 0-2 (default: 1)
+                rate: 0.9,   // Speed, range: 0-2 (default: 1)
+                volume: 1    // Range: 0-1 (default: 1)
+        });
         }
 
         function showAnswer() {
