@@ -52,8 +52,9 @@
         function speakVerb() {
             let msg = new SpeechSynthesisUtterance(currentVerb);
             msg.lang = "ja-JP"; // Japanese voice
-            let voice = speechSynthesis.getVoices().find(voice => voice.name.includes("Google"))
-            msg.voice = voice;
+            let voices = speechSynthesis.getVoices().filter(voice => voice.lang == "ja-JP")
+            msg.voice = voices[Math.floor(Math.random() * voices.length)];
+            console.log(voices)
             speechSynthesis.speak(msg);
         }
 
