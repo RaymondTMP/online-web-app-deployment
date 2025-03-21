@@ -20,7 +20,7 @@ def home():
 @app.route("/get-verb", methods=["GET"])
 def get_verb():
     verb_row = verbs.sample(n=1).to_dict(orient="records")[0] 
-    chosen_form = random.choice(["Te Form", "Ta Form", "Nai Form", "Masu Form"])
+    chosen_form = random.choice(["Te Form", "Ta Form"])
 
    
     response_data = json.dumps({
