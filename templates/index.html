@@ -8,17 +8,26 @@
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
         button { padding: 10px 20px; font-size: 18px; margin: 10px; }
+        .checkbox-group { margin: 10px; }
     </style>
 </head>
 <body>
 
     <h1>Japanese Verb Study</h1>
-    <p>Listen and guess the verb form.</p>
+    <p>Choose verb forms to practice:</p>
 
-    
+    <div class="checkbox-group">
+        <label><input type="checkbox" name="verbForm" value="Dictionary Form" checked> Dictionary Form</label>
+        <label><input type="checkbox" name="verbForm" value="Te Form" checked> Te Form</label>
+        <label><input type="checkbox" name="verbForm" value="Ta Form" checked> Ta Form</label>
+        <label><input type="checkbox" name="verbForm" value="Nai Form" checked> Nai Form</label>
+        <label><input type="checkbox" name="verbForm" value="Masu Form" checked> Masu Form</label>
+    </div>
+
     <button onclick="speakVerb()">🔊 Repeat</button>
     <button onclick="showAnswer()">✅ Show Answer</button>
     <button onclick="nextVerb()">➡ Next</button>
+    <button onclick="resetVerbs()">🔄 Reset Verbs</button>
 
     <div id="answer" style="display: none;">
         <h3>All Forms:</h3>
@@ -34,11 +43,17 @@
 
         async function fetchVerb() {
             document.getElementById("answer").style.display = "none";
-            
-            let response = await fetch("/get-verb");
+
+            // Get selected verb forms
+            let selectedForms = [];
+            document.querySelectorAll("input[name='verbForm']:checked").forEach(checkbox => {
+                selectedForms.push(encodeURIComponent(checkbox.value));
+            });
+
+            // Fetch verb with selected forms
+            let response = await fetch(`/get-verb?forms[]=${selectedForms.join("&forms[]=")}`);
             let data = await response.json();
 
-        
             currentVerb = data.verb;
 
             document.getElementById("dictForm").textContent = data.all_forms["Dictionary Form"];
@@ -52,10 +67,10 @@
 
         function speakVerb() {
             responsiveVoice.speak(currentVerb, 'Japanese Female', {
-                pitch: 1,    // Range: 0-2 (default: 1)
-                rate: 1,   // Speed, range: 0-2 (default: 1)
-                volume: 1    // Range: 0-1 (default: 1)
-        });
+                pitch: 1,
+                rate: 1,
+                volume: 1
+            });
         }
 
         function showAnswer() {
@@ -64,6 +79,12 @@
 
         function nextVerb() {
             fetchVerb();
+        }
+
+        async function resetVerbs() {
+            let response = await fetch("/reset", { method: "POST" });
+            let data = await response.json();
+            alert(data.message);
         }
 
         window.onload = fetchVerb;
