@@ -8,26 +8,28 @@
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
         button { padding: 10px 20px; font-size: 18px; margin: 10px; }
-        .checkbox-group { margin: 10px; }
+        #formSelection { display: none; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <h1>Japanese Verb Study</h1>
-    <p>Choose verb forms to practice:</p>
+    <p>Listen and guess the verb form.</p>
 
-    <div class="checkbox-group">
-        <label><input type="checkbox" name="verbForm" value="Dictionary Form" checked> Dictionary Form</label>
-        <label><input type="checkbox" name="verbForm" value="Te Form" checked> Te Form</label>
-        <label><input type="checkbox" name="verbForm" value="Ta Form" checked> Ta Form</label>
-        <label><input type="checkbox" name="verbForm" value="Nai Form" checked> Nai Form</label>
-        <label><input type="checkbox" name="verbForm" value="Masu Form" checked> Masu Form</label>
+    <div id="formSelection">
+        <h3>Select Verb Forms:</h3>
+        <label><input type="checkbox" value="Dictionary Form"> Dictionary</label>
+        <label><input type="checkbox" value="Te Form" checked> Te Form</label>
+        <label><input type="checkbox" value="Ta Form" checked> Ta Form</label>
+        <label><input type="checkbox" value="Nai Form" checked> Nai Form</label>
+        <label><input type="checkbox" value="Masu Form" checked> Masu Form</label>
+        <br><br>
+        <button onclick="startSession()">Start</button>
     </div>
 
     <button onclick="speakVerb()">🔊 Repeat</button>
     <button onclick="showAnswer()">✅ Show Answer</button>
     <button onclick="nextVerb()">➡ Next</button>
-    <button onclick="resetVerbs()">🔄 Reset Verbs</button>
 
     <div id="answer" style="display: none;">
         <h3>All Forms:</h3>
@@ -39,20 +41,34 @@
     </div>
 
     <script>
+        let usedVerbs = [];  // Store used verbs for this session
         let currentVerb = "";
+
+        function startSession() {
+            let selectedForms = [];
+            document.querySelectorAll("#formSelection input:checked").forEach(input => {
+                selectedForms.push(input.value);
+            });
+
+            sessionStorage.setItem("selectedForms", JSON.stringify(selectedForms));
+            sessionStorage.setItem("usedVerbs", JSON.stringify([]));  // Reset used verbs
+            usedVerbs = [];  // Reset in memory
+
+            document.getElementById("formSelection").style.display = "none";
+            fetchVerb();
+        }
 
         async function fetchVerb() {
             document.getElementById("answer").style.display = "none";
 
-            // Get selected verb forms
-            let selectedForms = [];
-            document.querySelectorAll("input[name='verbForm']:checked").forEach(checkbox => {
-                selectedForms.push(encodeURIComponent(checkbox.value));
-            });
+            let selectedForms = JSON.parse(sessionStorage.getItem("selectedForms")) || ["Te Form", "Ta Form"];
+            let url = `/get-verb?forms=${selectedForms.join(",")}&usedVerbs=${usedVerbs.join(",")}`;
 
-            // Fetch verb with selected forms
-            let response = await fetch(`/get-verb?forms[]=${selectedForms.join("&forms[]=")}`);
+            let response = await fetch(url);
             let data = await response.json();
+
+            usedVerbs = data.usedVerbs;  // Update used verbs list
+            sessionStorage.setItem("usedVerbs", JSON.stringify(usedVerbs));
 
             currentVerb = data.verb;
 
@@ -66,7 +82,7 @@
         }
 
         function speakVerb() {
-            responsiveVoice.speak(currentVerb, 'Japanese Male', {
+            responsiveVoice.speak(currentVerb, 'Japanese Female', {
                 pitch: 1,
                 rate: 1,
                 volume: 1
@@ -81,13 +97,14 @@
             fetchVerb();
         }
 
-        async function resetVerbs() {
-            let response = await fetch("/reset", { method: "POST" });
-            let data = await response.json();
-            alert(data.message);
-        }
-
-        window.onload = fetchVerb;
+        window.onload = function() {
+            if (!sessionStorage.getItem("selectedForms")) {
+                document.getElementById("formSelection").style.display = "block";
+            } else {
+                usedVerbs = JSON.parse(sessionStorage.getItem("usedVerbs")) || [];
+                fetchVerb();
+            }
+        };
     </script>
 
 </body>
