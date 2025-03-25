@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
-    <title>Japanese Verb Study Program</title>
+    <title>Japanese Verb Study</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
         button { padding: 10px 20px; font-size: 18px; margin: 10px; }
-        #formSelection { display: none; margin-bottom: 20px; }
+        #formSelection { margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -18,13 +18,11 @@
 
     <div id="formSelection">
         <h3>Select Verb Forms:</h3>
-        <label><input type="checkbox" value="Dictionary Form"> Dictionary</label>
+        <label><input type="checkbox" value="Dictionary Form" checked> Dictionary</label>
         <label><input type="checkbox" value="Te Form" checked> Te Form</label>
         <label><input type="checkbox" value="Ta Form" checked> Ta Form</label>
         <label><input type="checkbox" value="Nai Form" checked> Nai Form</label>
         <label><input type="checkbox" value="Masu Form" checked> Masu Form</label>
-        <br><br>
-        <button onclick="startSession()">Start</button>
     </div>
 
     <button onclick="speakVerb()">🔊 Repeat</button>
@@ -41,33 +39,23 @@
     </div>
 
     <script>
-        let usedVerbs = [];  // Store used verbs for this session
+        let usedVerbs = JSON.parse(sessionStorage.getItem("usedVerbs")) || [];
         let currentVerb = "";
 
-        function startSession() {
+        async function fetchVerb() {
+            document.getElementById("answer").style.display = "none";
+
             let selectedForms = [];
             document.querySelectorAll("#formSelection input:checked").forEach(input => {
                 selectedForms.push(input.value);
             });
 
-            sessionStorage.setItem("selectedForms", JSON.stringify(selectedForms));
-            sessionStorage.setItem("usedVerbs", JSON.stringify([]));  // Reset used verbs
-            usedVerbs = [];  // Reset in memory
-
-            document.getElementById("formSelection").style.display = "none";
-            fetchVerb();
-        }
-
-        async function fetchVerb() {
-            document.getElementById("answer").style.display = "none";
-
-            let selectedForms = JSON.parse(sessionStorage.getItem("selectedForms")) || ["Te Form", "Ta Form"];
             let url = `/get-verb?forms=${selectedForms.join(",")}&usedVerbs=${usedVerbs.join(",")}`;
 
             let response = await fetch(url);
             let data = await response.json();
 
-            usedVerbs = data.usedVerbs;  // Update used verbs list
+            usedVerbs = data.usedVerbs;
             sessionStorage.setItem("usedVerbs", JSON.stringify(usedVerbs));
 
             currentVerb = data.verb;
@@ -97,14 +85,7 @@
             fetchVerb();
         }
 
-        window.onload = function() {
-            if (!sessionStorage.getItem("selectedForms")) {
-                document.getElementById("formSelection").style.display = "block";
-            } else {
-                usedVerbs = JSON.parse(sessionStorage.getItem("usedVerbs")) || [];
-                fetchVerb();
-            }
-        };
+        window.onload = fetchVerb;
     </script>
 
 </body>
