@@ -18,11 +18,12 @@
 
     <div id="formSelection">
         <h3>Select Verb Forms:</h3>
-        <label><input type="checkbox" value="Dictionary Form" checked> Dictionary</label>
+        <label><input type="checkbox" value="Dictionary Form"> Dictionary</label>
         <label><input type="checkbox" value="Te Form" checked> Te Form</label>
         <label><input type="checkbox" value="Ta Form" checked> Ta Form</label>
         <label><input type="checkbox" value="Nai Form" checked> Nai Form</label>
         <label><input type="checkbox" value="Masu Form" checked> Masu Form</label>
+        <label><input type="checkbox" value="Volitional Form"> Volitional Form</label>
     </div>
 
     <button onclick="speakVerb()">🔊 Repeat</button>
@@ -36,6 +37,7 @@
         <p><strong>Ta Form:</strong> <span id="taForm"></span></p>
         <p><strong>Nai Form:</strong> <span id="naiForm"></span></p>
         <p><strong>Masu Form:</strong> <span id="masuForm"></span></p>
+        <p><strong>Volitional Form:</strong> <span id="volitionalForm"></span></p>
     </div>
 
     <script>
@@ -65,6 +67,7 @@
             document.getElementById("taForm").textContent = data.all_forms["Ta Form"];
             document.getElementById("naiForm").textContent = data.all_forms["Nai Form"];
             document.getElementById("masuForm").textContent = data.all_forms["Masu Form"];
+            document.getElementById("volitionalForm").textContent = data.all_forms["Volitional Form"];
 
             speakVerb();
         }
