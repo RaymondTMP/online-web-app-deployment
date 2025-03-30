@@ -4,48 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
-    <title>Japanese Verb Study</title>
+    <title>Japanese Study</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
         button { padding: 10px 20px; font-size: 18px; margin: 10px; }
-        #formSelection { margin-bottom: 20px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <h1>Japanese Verb Study</h1>
-    <p>Listen and guess the verb form.</p>
-
-    <div id="formSelection">
-        <h3>Select Verb Forms:</h3>
-        <label><input type="checkbox" value="Dictionary Form"> Dictionary</label>
-        <label><input type="checkbox" value="Te Form" checked> Te Form</label>
-        <label><input type="checkbox" value="Ta Form" checked> Ta Form</label>
-        <label><input type="checkbox" value="Nai Form" checked> Nai Form</label>
-        <label><input type="checkbox" value="Masu Form" checked> Masu Form</label>
-        <label><input type="checkbox" value="Volitional Form"> Volitional Form</label>
+    <!-- Selection Screen -->
+    <div id="startScreen">
+        <h1>Japanese Study</h1>
+        <p>Select Practice Mode</p>
+        <button onclick="startPractice('verb')">Verb Practice</button>
+        <button onclick="startPractice('nonVerb')">Non-Verb Practice</button>
     </div>
 
-    <button onclick="speakVerb()">🔊 Repeat</button>
-    <button onclick="showAnswer()">✅ Show Answer</button>
-    <button onclick="nextVerb()">➡ Next</button>
+    <!-- Verb Practice Section -->
+    <div id="verbPractice" class="hidden">
+        <h1>Japanese Verb Study</h1>
+        <p>Listen and guess the verb form.</p>
 
-    <div id="answer" style="display: none;">
-        <h3>All Forms:</h3>
-        <p><strong>Dictionary:</strong> <span id="dictForm"></span></p>
-        <p><strong>Te Form:</strong> <span id="teForm"></span></p>
-        <p><strong>Ta Form:</strong> <span id="taForm"></span></p>
-        <p><strong>Nai Form:</strong> <span id="naiForm"></span></p>
-        <p><strong>Masu Form:</strong> <span id="masuForm"></span></p>
-        <p><strong>Volitional Form:</strong> <span id="volitionalForm"></span></p>
+        <div id="formSelection">
+            <h3>Select Verb Forms:</h3>
+            <label><input type="checkbox" value="Dictionary Form"> Dictionary</label>
+            <label><input type="checkbox" value="Te Form" checked> Te Form</label>
+            <label><input type="checkbox" value="Ta Form" checked> Ta Form</label>
+            <label><input type="checkbox" value="Nai Form" checked> Nai Form</label>
+            <label><input type="checkbox" value="Masu Form" checked> Masu Form</label>
+            <label><input type="checkbox" value="Volitional Form"> Volitional Form</label>
+        </div>
+
+        <button onclick="speakVerb()">🔊 Repeat</button>
+        <button onclick="showAnswer()">✅ Show Answer</button>
+        <button onclick="nextVerb()">➡ Next</button>
+
+        <div id="answer" class="hidden">
+            <h3>All Forms:</h3>
+            <p><strong>Dictionary:</strong> <span id="dictForm"></span></p>
+            <p><strong>Te Form:</strong> <span id="teForm"></span></p>
+            <p><strong>Ta Form:</strong> <span id="taForm"></span></p>
+            <p><strong>Nai Form:</strong> <span id="naiForm"></span></p>
+            <p><strong>Masu Form:</strong> <span id="masuForm"></span></p>
+            <p><strong>Volitional Form:</strong> <span id="volitionalForm"></span></p>
+        </div>
+    </div>
+
+    <!-- Non-Verb Practice Section -->
+    <div id="nonVerbPractice" class="hidden">
+        <h1>Japanese Non-Verb Study</h1>
+        <p>Listen and guess the word.</p>
+
+        <button onclick="speakNonVerb()">🔊 Repeat</button>
+        <button onclick="showNonVerbAnswer()">✅ Show Answer</button>
+        <button onclick="nextNonVerb()">➡ Next</button>
+
+        <div id="nonVerbAnswer" class="hidden">
+            <h3>Answer:</h3>
+            <p><strong>Kanji:</strong> <span id="nonVerbKanji"></span></p>
+            <p><strong>Kana:</strong> <span id="nonVerbKana"></span></p>
+        </div>
     </div>
 
     <script>
         let usedVerbs = JSON.parse(sessionStorage.getItem("usedVerbs")) || [];
+        let usedWords = JSON.parse(sessionStorage.getItem("usedWords")) || [];
         let currentVerb = "";
+        let currentNonVerbKanji = "";
+        let currentNonVerbKana = "";
+
+        function startPractice(mode) {
+            document.getElementById("startScreen").classList.add("hidden");
+            if (mode === "verb") {
+                document.getElementById("verbPractice").classList.remove("hidden");
+                fetchVerb();
+            } else {
+                document.getElementById("nonVerbPractice").classList.remove("hidden");
+                fetchNonVerb();
+            }
+        }
 
         async function fetchVerb() {
-            document.getElementById("answer").style.display = "none";
+            document.getElementById("answer").classList.add("hidden");
 
             let selectedForms = [];
             document.querySelectorAll("#formSelection input:checked").forEach(input => {
@@ -53,7 +94,6 @@
             });
 
             let url = `/get-verb?forms=${selectedForms.join(",")}&usedVerbs=${usedVerbs.join(",")}`;
-
             let response = await fetch(url);
             let data = await response.json();
 
@@ -72,23 +112,47 @@
             speakVerb();
         }
 
+        async function fetchNonVerb() {
+            document.getElementById("nonVerbAnswer").classList.add("hidden");
+
+            let url = `/get-non-verb?usedWords=${usedWords.join(",")}`;
+            let response = await fetch(url);
+            let data = await response.json();
+
+            usedWords = data.usedWords;
+            sessionStorage.setItem("usedWords", JSON.stringify(usedWords));
+
+            currentNonVerbKanji = data.kanji;
+            currentNonVerbKana = data.kana;
+
+            speakNonVerb();
+        }
+
         function speakVerb() {
-            responsiveVoice.speak(currentVerb, 'Japanese Male', {
-                pitch: 1,
-                rate: 1,
-                volume: 1
-            });
+            responsiveVoice.speak(currentVerb, 'Japanese Male');
+        }
+
+        function speakNonVerb() {
+            responsiveVoice.speak(currentNonVerbKana, 'Japanese Male');
         }
 
         function showAnswer() {
-            document.getElementById("answer").style.display = "block";
+            document.getElementById("answer").classList.remove("hidden");
+        }
+
+        function showNonVerbAnswer() {
+            document.getElementById("nonVerbKanji").textContent = currentNonVerbKanji;
+            document.getElementById("nonVerbKana").textContent = currentNonVerbKana;
+            document.getElementById("nonVerbAnswer").classList.remove("hidden");
         }
 
         function nextVerb() {
             fetchVerb();
         }
 
-        window.onload = fetchVerb;
+        function nextNonVerb() {
+            fetchNonVerb();
+        }
     </script>
 
 </body>
