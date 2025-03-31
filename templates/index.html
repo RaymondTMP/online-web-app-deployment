@@ -34,6 +34,7 @@
             <label><input type="checkbox" value="Nai Form" checked> Nai Form</label>
             <label><input type="checkbox" value="Masu Form" checked> Masu Form</label>
             <label><input type="checkbox" value="Volitional Form"> Volitional Form</label>
+            <label><input type="checkbox" value="Ba Form"> Ba Form</label>
         </div>
 
         <button onclick="speakVerb()">🔊 Repeat</button>
@@ -48,6 +49,7 @@
             <p><strong>Nai Form:</strong> <span id="naiForm"></span></p>
             <p><strong>Masu Form:</strong> <span id="masuForm"></span></p>
             <p><strong>Volitional Form:</strong> <span id="volitionalForm"></span></p>
+            <p><strong>Ba Form:</strong> <span id="baForm"></span></p>
         </div>
     </div>
 
@@ -108,6 +110,7 @@
             document.getElementById("naiForm").textContent = data.all_forms["Nai Form"];
             document.getElementById("masuForm").textContent = data.all_forms["Masu Form"];
             document.getElementById("volitionalForm").textContent = data.all_forms["Volitional Form"];
+            document.getElementById("baForm").textContent = data.all_forms["Ba Form"];
 
             speakVerb();
         }
