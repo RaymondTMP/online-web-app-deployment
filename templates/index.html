@@ -123,6 +123,34 @@
             speakNonVerb();
         }
 
+        function speakVerb() {
+            responsiveVoice.speak(currentVerb, 'Japanese Male');
+        }
+
+        function speakNonVerb() {
+            responsiveVoice.speak(currentNonVerbKana, 'Japanese Male');
+        }
+
+        function showAnswer() {
+            document.getElementById("answer").classList.remove("hidden");
+        }
+
+        function showNonVerbAnswer() {
+            document.getElementById("nonVerbKanji").textContent = currentNonVerbKanji;
+            document.getElementById("nonVerbKana").textContent = currentNonVerbKana;
+            document.getElementById("nonVerbAnswer").classList.remove("hidden");
+        }
+
+        function nextVerb() {
+            fetchVerb();
+        }
+
+        function nextNonVerb() {
+            fetchNonVerb();
+        }
+
+
+
         async function resetSession() {
             await fetch("/reset-session", { method: "POST" });
             alert("Session reset successfully!");
