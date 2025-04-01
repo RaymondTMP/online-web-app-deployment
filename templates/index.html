@@ -19,6 +19,7 @@
         <p>Select Practice Mode</p>
         <button onclick="startPractice('verb')">Verb Practice</button>
         <button onclick="startPractice('nonVerb')">Non-Verb Practice</button>
+        <button onclick="resetSession()">🔄 Reset</button>
     </div>
 
     <!-- Verb Practice Section -->
@@ -70,8 +71,6 @@
     </div>
 
     <script>
-        let usedVerbs = JSON.parse(sessionStorage.getItem("usedVerbs")) || [];
-        let usedWords = JSON.parse(sessionStorage.getItem("usedWords")) || [];
         let currentVerb = "";
         let currentNonVerbKanji = "";
         let currentNonVerbKana = "";
@@ -95,12 +94,9 @@
                 selectedForms.push(input.value);
             });
 
-            let url = `/get-verb?forms=${selectedForms.join(",")}&usedVerbs=${usedVerbs.join(",")}`;
+            let url = `/get-verb?forms=${selectedForms.join(",")}`;
             let response = await fetch(url);
             let data = await response.json();
-
-            usedVerbs = data.usedVerbs;
-            sessionStorage.setItem("usedVerbs", JSON.stringify(usedVerbs));
 
             currentVerb = data.verb;
 
@@ -118,12 +114,8 @@
         async function fetchNonVerb() {
             document.getElementById("nonVerbAnswer").classList.add("hidden");
 
-            let url = `/get-non-verb?usedWords=${usedWords.join(",")}`;
-            let response = await fetch(url);
+            let response = await fetch(`/get-non-verb`);
             let data = await response.json();
-
-            usedWords = data.usedWords;
-            sessionStorage.setItem("usedWords", JSON.stringify(usedWords));
 
             currentNonVerbKanji = data.kanji;
             currentNonVerbKana = data.kana;
@@ -131,31 +123,12 @@
             speakNonVerb();
         }
 
-        function speakVerb() {
-            responsiveVoice.speak(currentVerb, 'Japanese Male');
+        async function resetSession() {
+            await fetch("/reset-session", { method: "POST" });
+            alert("Session reset successfully!");
+            location.reload();
         }
 
-        function speakNonVerb() {
-            responsiveVoice.speak(currentNonVerbKana, 'Japanese Male');
-        }
-
-        function showAnswer() {
-            document.getElementById("answer").classList.remove("hidden");
-        }
-
-        function showNonVerbAnswer() {
-            document.getElementById("nonVerbKanji").textContent = currentNonVerbKanji;
-            document.getElementById("nonVerbKana").textContent = currentNonVerbKana;
-            document.getElementById("nonVerbAnswer").classList.remove("hidden");
-        }
-
-        function nextVerb() {
-            fetchVerb();
-        }
-
-        function nextNonVerb() {
-            fetchNonVerb();
-        }
     </script>
 
 </body>
