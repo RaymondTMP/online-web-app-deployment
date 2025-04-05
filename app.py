@@ -36,12 +36,15 @@ def get_verb():
         available_verbs = verbs.to_dict(orient="records")
         session["used_verbs"] = []
 
-    verb_row = random.choice(available_verbs)
-    chosen_form = random.choice(selected_forms)
+    while True:
+        verb_row = random.choice(available_verbs)
+        chosen_form = random.choice(selected_forms)
+        # Add verb to session storage
+        session["used_verbs"].append(verb_row["Dictionary Form"])
+        session.modified = True  # Ensure session updates
 
-    # Add verb to session storage
-    session["used_verbs"].append(verb_row["Dictionary Form"])
-    session.modified = True  # Ensure session updates
+        if (verb_row[chosen_form] != "na"):
+            break
 
     return jsonify({
         "form": chosen_form,
