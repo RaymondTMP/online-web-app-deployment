@@ -157,6 +157,12 @@
             location.reload();
         }
 
+        const ping = setInterval(() => {
+            fetch("/ping", { method: "GET" })
+                .then(response => response.json())
+                .catch(error => clearInterval(ping));
+        }, 10000)
+
     </script>
 
 </body>

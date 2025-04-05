@@ -84,5 +84,11 @@ def reset_session():
     session.pop("used_words", None)
     return jsonify({"message": "Session reset successful"})
 
+
+@app.route("/ping", methods=["GET"])
+def ping():
+    
+    return jsonify({"message": "approved"}) 
+
 if __name__ == "__main__":
     app.run(debug=False)
