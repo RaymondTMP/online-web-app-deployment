@@ -71,11 +71,13 @@
     </div>
 
     <script>
+        let toPing = true;
         let currentVerb = "";
         let currentNonVerbKanji = "";
         let currentNonVerbKana = "";
 
         function startPractice(mode) {
+            commonClick();
             document.getElementById("startScreen").classList.add("hidden");
             if (mode === "verb") {
                 document.getElementById("verbPractice").classList.remove("hidden");
@@ -124,29 +126,39 @@
         }
 
         function speakVerb() {
+            commonClick();
             responsiveVoice.speak(currentVerb, 'Japanese Male');
         }
 
         function speakNonVerb() {
+            commonClick();
             responsiveVoice.speak(currentNonVerbKana, 'Japanese Male');
         }
 
         function showAnswer() {
+            commonClick();
             document.getElementById("answer").classList.remove("hidden");
         }
 
         function showNonVerbAnswer() {
+            commonClick();
             document.getElementById("nonVerbKanji").textContent = currentNonVerbKanji;
             document.getElementById("nonVerbKana").textContent = currentNonVerbKana;
             document.getElementById("nonVerbAnswer").classList.remove("hidden");
         }
 
         function nextVerb() {
+            commonClick();
             fetchVerb();
         }
 
         function nextNonVerb() {
+            commonClick();
             fetchNonVerb();
+        }
+
+        function commonClick() {
+            toPing = true;
         }
 
 
@@ -158,10 +170,15 @@
         }
 
         const ping = setInterval(() => {
+            if (!toPing) return;
             fetch("/ping", { method: "GET" })
                 .then(response => response.json())
                 .catch(error => clearInterval(ping));
-        }, 10000)
+        }, 15000)
+
+        const timer = setInterval(() => {
+            toPing = false;   
+        }, 60000); 
 
     </script>
 
