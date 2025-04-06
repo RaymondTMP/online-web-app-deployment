@@ -10,7 +10,7 @@ def load_verbs():
     return pd.read_excel("verbs.xlsx", engine="openpyxl")
 
 def load_words():
-    return pd.read_excel("non_verbs.xlsx", engine="openpyxl")
+    return pd.read_excel("words.xlsx", engine="openpyxl")
 
 verbs = load_verbs()
 words = load_words()
